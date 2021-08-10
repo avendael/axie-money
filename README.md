@@ -8,9 +8,9 @@ specified by the user.
 
 ```python
 from decimal import Decimal
-from axie_money.calculators import BreedingROICalculator
+from axie_money.calculators import BreedingProfitCalculator
 
-calculator = BreedingROICalculator(
+calculator = BreedingProfitCalculator(
 	slp_rate=Decimal("0.26"),
 	axs_rate=Decimal("40"),
 	eth_rate=Decimal("2190"),

@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from axie_money.calculators import BreedingROICalculator
+from axie_money.calculators import BreedingProfitCalculator
 
 
-class TestBreedingROICalculator(object):
-    calculator = BreedingROICalculator(
+class TestBreedingProfitCalculator(object):
+    calculator = BreedingProfitCalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),
@@ -16,10 +16,10 @@ class TestBreedingROICalculator(object):
         assert self.calculator.offspring_average_price == Decimal("0.4829")
 
     def test_calculate_sale_price(self):
-        assert self.calculator.calculate_sale_price(3) == Decimal("3037.82")
+        assert self.calculator.calculate_sale_price(2) == Decimal("2025.21")
 
     def test_calculate_sale_price(self):
-        assert self.calculator.calculate_sale_price(3) == Decimal("3037.82")
+        assert self.calculator.calculate_sale_price(2) == Decimal("2025.21")
 
     def test_axs_to_usd(self):
         assert self.calculator.axs_to_usd(Decimal("4.11")) == Decimal("164.40")
@@ -31,8 +31,8 @@ class TestBreedingROICalculator(object):
         assert self.calculator.eth_to_usd(Decimal("6.69")) == Decimal("14651.1")
 
 
-class TestBreedingROICalculatorABCLoop(object):
-    calculator = BreedingROICalculator(
+class TestBreedingProfitCalculatorABCLoop(object):
+    calculator = BreedingProfitCalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),
@@ -250,8 +250,8 @@ class TestBreedingROICalculatorABCLoop(object):
         ) == Decimal("15.35")
 
 
-class TestBreedingROICalculatorABCDLoop(object):
-    calculator = BreedingROICalculator(
+class TestBreedingProfitCalculatorABCDLoop(object):
+    calculator = BreedingProfitCalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),
