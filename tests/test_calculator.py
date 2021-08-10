@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from axie_breeding_calculator.calculators import ROICalculator
+from axie_money.calculators import BreedingROICalculator
 
 
-class TestROICalculator(object):
-    calculator = ROICalculator(
+class TestBreedingROICalculator(object):
+    calculator = BreedingROICalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),
@@ -31,8 +31,8 @@ class TestROICalculator(object):
         assert self.calculator.eth_to_usd(Decimal("6.69")) == Decimal("14651.1")
 
 
-class TestROICalculatorABCLoop(object):
-    calculator = ROICalculator(
+class TestBreedingROICalculatorABCLoop(object):
+    calculator = BreedingROICalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),
@@ -59,10 +59,10 @@ class TestROICalculatorABCLoop(object):
 
     def test_calculate_profit(self):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
 
         assert self.calculator.calculate_profit(breeding_cost, sale_price) == Decimal(
-            "1539.82"
+            "527.21"
         )
 
     def test_calculate_profit_slp_farmed(self):
@@ -70,42 +70,42 @@ class TestROICalculatorABCLoop(object):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
 
         assert self.calculator.calculate_profit(breeding_cost, sale_price) == Decimal(
-            "1773.82"
+            "761.21"
         )
 
     def test_calculate_profit_parents_sold(self):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
 
         assert self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
-        ) == Decimal("2572.62")
+        ) == Decimal("1560.01")
 
     def test_calculate_profit_parents_sold_slp_farmed(self):
         slp_farmed = self.calculator.slp_to_usd(900)
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
 
         assert self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
-        ) == Decimal("2806.62")
+        ) == Decimal("1794.01")
 
     def test_calculate_roi_generations(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(breeding_cost, sale_price)
 
         assert self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
-        ) == Decimal("3.11")
+        ) == Decimal("9.07")
 
     def test_calculate_roi_generations_slp_farmed(self):
         slp_farmed = self.calculator.slp_to_usd(900)
@@ -115,26 +115,26 @@ class TestROICalculatorABCLoop(object):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(breeding_cost, sale_price)
 
         assert self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
-        ) == Decimal("2.56")
+        ) == Decimal("5.98")
 
     def test_calculate_roi_generations_parents_sold(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
         )
 
         assert self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
-        ) == Decimal("1.86")
+        ) == Decimal("3.07")
 
     def test_calculate_roi_generations_parents_sold_slp_farmed(self):
         slp_farmed = self.calculator.slp_to_usd(900)
@@ -144,21 +144,21 @@ class TestROICalculatorABCLoop(object):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
         )
 
         assert self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
-        ) == Decimal("1.62")
+        ) == Decimal("2.54")
 
     def test_calculate_roi_days(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(breeding_cost, sale_price)
         roi_generations = self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
@@ -166,7 +166,7 @@ class TestROICalculatorABCLoop(object):
 
         assert self.calculator.calculate_roi_days(
             roi_generations=roi_generations
-        ) == Decimal("15.55")
+        ) == Decimal("45.35")
 
     def test_calculate_roi_days_slp_farmed(self):
         slp_farmed = self.calculator.slp_to_usd(900)
@@ -176,7 +176,7 @@ class TestROICalculatorABCLoop(object):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(breeding_cost, sale_price)
         roi_generations = self.calculator.calculate_roi_generations(
             initial_capital, breeding_cost, profit
@@ -184,14 +184,14 @@ class TestROICalculatorABCLoop(object):
 
         assert self.calculator.calculate_roi_days(
             roi_generations=roi_generations
-        ) == Decimal("12.80")
+        ) == Decimal("29.90")
 
     def test_calculate_roi_days_parents_sold(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
         )
@@ -201,7 +201,7 @@ class TestROICalculatorABCLoop(object):
 
         assert self.calculator.calculate_roi_days(
             roi_generations=roi_generations
-        ) == Decimal("9.30")
+        ) == Decimal("15.35")
 
     def test_calculate_roi_days_parents_sold_slp_farmed(self):
         slp_farmed = self.calculator.slp_to_usd(900)
@@ -211,7 +211,7 @@ class TestROICalculatorABCLoop(object):
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
         )
@@ -221,37 +221,37 @@ class TestROICalculatorABCLoop(object):
 
         assert self.calculator.calculate_roi_days(
             roi_generations=roi_generations
-        ) == Decimal("8.10")
+        ) == Decimal("12.70")
 
     def test_calculate_roi_days_unknown_generations(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(breeding_cost, sale_price)
 
         assert self.calculator.calculate_roi_days(
             initial_capital=initial_capital, breeding_cost=breeding_cost, profit=profit
-        ) == Decimal("15.55")
+        ) == Decimal("45.35")
 
     def test_calculate_roi_days_unknown_generations_parents_sold(self):
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(4, 2)
-        sale_price = self.calculator.calculate_sale_price(3)
+        sale_price = self.calculator.calculate_sale_price(2)
         profit = self.calculator.calculate_profit(
             breeding_cost, sale_price, parents_sold=2
         )
 
         assert self.calculator.calculate_roi_days(
             initial_capital=initial_capital, breeding_cost=breeding_cost, profit=profit
-        ) == Decimal("9.30")
+        ) == Decimal("15.35")
 
 
-class TestROICalculatorABCDLoop(object):
-    calculator = ROICalculator(
+class TestBreedingROICalculatorABCDLoop(object):
+    calculator = BreedingROICalculator(
         slp_rate=Decimal("0.26"),
         axs_rate=Decimal("40"),
         eth_rate=Decimal("2190"),

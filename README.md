@@ -8,9 +8,9 @@ specified by the user.
 
 ```python
 from decimal import Decimal
-from axie_breeding_calculator.calculators import ROICalculator
+from axie_money.calculators import BreedingROICalculator
 
-calculator = ROICalculator(
+calculator = BreedingROICalculator(
 	slp_rate=Decimal("0.26"),
 	axs_rate=Decimal("40"),
 	eth_rate=Decimal("2190"),
@@ -28,7 +28,7 @@ breeding_cost = calculator.calculate_cumulative_breeding_cost(
 	breed_count=4,
 	parent_count=2
 )
-sale_price = calculator.calculate_sale_price(offspring_sold=3)
+sale_price = calculator.calculate_sale_price(offspring_sold=2)
 profit = calculator.calculate_profit(breeding_cost, sale_price)
 roi_generations = calculator.calculate_roi_generations(
 	initial_capital, breeding_cost, profit

@@ -4,7 +4,7 @@ from typing import List
 from .constants import AXS_BREEDING_COST, SLP_BREEDING_COST
 
 
-class ROICalculator(object):
+class BreedingROICalculator(object):
     """Calculates Axie Infinity breeding profit based on given inputs.
 
     Supports a scalable amount of parents in a breeding loop, wherein the
