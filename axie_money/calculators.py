@@ -4,6 +4,27 @@ from typing import List
 from .constants import AXS_BREEDING_COST, SLP_BREEDING_COST
 
 
+class PriceConverter(object):
+    """Converts ETH, AXS, and SLP price to USD."""
+
+    def __init__(self, eth_rate: Decimal, axs_rate: Decimal, slp_rate: Decimal):
+        self.axs_rate = axs_rate
+        self.slp_rate = slp_rate
+        self.eth_rate = eth_rate
+
+    def axs_to_usd(self, amount: Decimal) -> Decimal:
+        """Converts AXS to USD."""
+        return self.axs_rate * amount
+
+    def slp_to_usd(self, amount: Decimal) -> Decimal:
+        """Converts SLP to USD."""
+        return self.slp_rate * amount
+
+    def eth_to_usd(self, amount: Decimal) -> Decimal:
+        """Converts ETH to USD."""
+        return self.eth_rate * amount
+
+
 class BreedingProfitCalculator(object):
     """Calculates Axie Infinity breeding profit based on given inputs.
 
@@ -15,15 +36,11 @@ class BreedingProfitCalculator(object):
 
     def __init__(
         self,
-        slp_rate: Decimal,
-        axs_rate: Decimal,
-        eth_rate: Decimal,
+        price_converter: PriceConverter,
         price_floor: Decimal,
         price_ceiling: Decimal,
     ):
-        self.slp_rate = slp_rate
-        self.axs_rate = axs_rate
-        self.eth_rate = eth_rate
+        self.price_converter = price_converter
         self.price_floor = price_floor
         self.price_ceiling = price_ceiling
 
@@ -38,7 +55,7 @@ class BreedingProfitCalculator(object):
         :param parent_prices: ETH denominated acquisition price of all parents.
         :returns: Initial investment in USD.
         """
-        return self.eth_to_usd(sum(parent_prices))
+        return self.price_converter.eth_to_usd(sum(parent_prices))
 
     def calculate_breeding_cost(self, parent_breed_counts: List[int]) -> Decimal:
         """Calculate the breeding cost given all of the parents' current breed counts.
@@ -48,8 +65,10 @@ class BreedingProfitCalculator(object):
         """
         prices = [SLP_BREEDING_COST[i] for i in parent_breed_counts]
         return (
-            self.slp_to_usd(sum(prices))
-            + self.axs_to_usd(AXS_BREEDING_COST * len(parent_breed_counts))
+            self.price_converter.slp_to_usd(sum(prices))
+            + self.price_converter.axs_to_usd(
+                AXS_BREEDING_COST * len(parent_breed_counts)
+            )
         ).quantize(Decimal("0.01"))
 
     def calculate_cumulative_breeding_cost(
@@ -87,7 +106,7 @@ class BreedingProfitCalculator(object):
         marketplace_fee = Decimal(1 - Decimal(0.0425))
         sale_price = self.offspring_average_price * offspring_sold * marketplace_fee
 
-        return self.eth_to_usd(sale_price).quantize(Decimal("0.01"))
+        return self.price_converter.eth_to_usd(sale_price).quantize(Decimal("0.01"))
 
     def calculate_profit(
         self,
@@ -103,7 +122,7 @@ class BreedingProfitCalculator(object):
         :returns: Profit after fees, breeding costs, and parents sold if specified.
         """
         return (
-            self.eth_to_usd(self.price_floor * parents_sold)
+            self.price_converter.eth_to_usd(self.price_floor * parents_sold)
             + sale_price
             - breeding_cost
         ).quantize(Decimal("0.01"))

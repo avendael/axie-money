@@ -1,13 +1,28 @@
 from decimal import Decimal
 
-from axie_money.calculators import BreedingProfitCalculator
+from axie_money.calculators import BreedingProfitCalculator, PriceConverter
+
+
+class TestPriceConverter(object):
+    converter = PriceConverter(
+        slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+    )
+
+    def test_axs_to_usd(self):
+        assert self.converter.axs_to_usd(Decimal("4.11")) == Decimal("164.40")
+
+    def test_slp_to_usd(self):
+        assert self.converter.slp_to_usd(Decimal("4500")) == Decimal("1170")
+
+    def test_eth_to_usd(self):
+        assert self.converter.eth_to_usd(Decimal("6.69")) == Decimal("14651.1")
 
 
 class TestBreedingProfitCalculator(object):
     calculator = BreedingProfitCalculator(
-        slp_rate=Decimal("0.26"),
-        axs_rate=Decimal("40"),
-        eth_rate=Decimal("2190"),
+        price_converter=PriceConverter(
+            slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+        ),
         price_floor=Decimal("0.2358"),
         price_ceiling=Decimal("0.73"),
     )
@@ -21,21 +36,12 @@ class TestBreedingProfitCalculator(object):
     def test_calculate_sale_price(self):
         assert self.calculator.calculate_sale_price(2) == Decimal("2025.21")
 
-    def test_axs_to_usd(self):
-        assert self.calculator.axs_to_usd(Decimal("4.11")) == Decimal("164.40")
-
-    def test_slp_to_usd(self):
-        assert self.calculator.slp_to_usd(Decimal("4500")) == Decimal("1170")
-
-    def test_eth_to_usd(self):
-        assert self.calculator.eth_to_usd(Decimal("6.69")) == Decimal("14651.1")
-
 
 class TestBreedingProfitCalculatorABCLoop(object):
     calculator = BreedingProfitCalculator(
-        slp_rate=Decimal("0.26"),
-        axs_rate=Decimal("40"),
-        eth_rate=Decimal("2190"),
+        price_converter=PriceConverter(
+            slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+        ),
         price_floor=Decimal("0.2358"),
         price_ceiling=Decimal("0.73"),
     )
@@ -51,7 +57,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         )
 
     def test_caclulate_cumulative_breeding_cost_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
 
         assert self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
@@ -66,7 +72,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         )
 
     def test_calculate_profit_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
@@ -85,7 +91,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         ) == Decimal("1560.01")
 
     def test_calculate_profit_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 2, slp_farmed
         )
@@ -108,7 +114,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         ) == Decimal("9.07")
 
     def test_calculate_roi_generations_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -137,7 +143,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         ) == Decimal("3.07")
 
     def test_calculate_roi_generations_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -169,7 +175,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         ) == Decimal("45.35")
 
     def test_calculate_roi_days_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -204,7 +210,7 @@ class TestBreedingProfitCalculatorABCLoop(object):
         ) == Decimal("15.35")
 
     def test_calculate_roi_days_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -252,9 +258,11 @@ class TestBreedingProfitCalculatorABCLoop(object):
 
 class TestBreedingProfitCalculatorABCDLoop(object):
     calculator = BreedingProfitCalculator(
-        slp_rate=Decimal("0.26"),
-        axs_rate=Decimal("40"),
-        eth_rate=Decimal("2190"),
+        price_converter=PriceConverter(
+            slp_rate=Decimal("0.26"),
+            axs_rate=Decimal("40"),
+            eth_rate=Decimal("2190"),
+        ),
         price_floor=Decimal("0.2358"),
         price_ceiling=Decimal("0.73"),
     )
@@ -270,7 +278,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         )
 
     def test_caclulate_cumulative_breeding_cost_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
 
         assert self.calculator.calculate_cumulative_breeding_cost(
             4, 4, slp_farmed
@@ -285,7 +293,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         )
 
     def test_calculate_profit_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 4, slp_farmed
         )
@@ -304,7 +312,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         ) == Decimal("3120.03")
 
     def test_calculate_profit_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         breeding_cost = self.calculator.calculate_cumulative_breeding_cost(
             4, 4, slp_farmed
         )
@@ -327,7 +335,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         ) == Decimal("7.00")
 
     def test_calculate_roi_generations_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -356,7 +364,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         ) == Decimal("2.36")
 
     def test_calculate_roi_generations_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -388,7 +396,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         ) == Decimal("35")
 
     def test_calculate_roi_days_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
@@ -423,7 +431,7 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         ) == Decimal("11.80")
 
     def test_calculate_roi_days_parents_sold_slp_farmed(self):
-        slp_farmed = self.calculator.slp_to_usd(900)
+        slp_farmed = self.calculator.price_converter.slp_to_usd(900)
         initial_capital = self.calculator.calculate_initial_capital(
             [Decimal("0.5"), Decimal("0.5"), Decimal("0.5"), Decimal("0.5")]
         )
