@@ -35,9 +35,7 @@ class BreedingProfitCalculator(object):
     def calculate_initial_capital(self, parent_prices: List[Decimal]) -> Decimal:
         """Convert initial capital ETH price to USD.
 
-        :param parent_1_price: ETH denominated acquisition price of the first parent.
-        :param parent_2_price: ETH denominated acquisition price of the second parent.
-        :param parent_3_price: ETH denominated acquisition price of the third parent.
+        :param parent_prices: ETH denominated acquisition price of all parents.
         :returns: Initial investment in USD.
         """
         return self.eth_to_usd(sum(parent_prices))
