@@ -1,4 +1,6 @@
-# Axie Breeding Calculator
+# Axie Money
+
+## Breeding Profit Calculator
 
 Calculate the time it takes prior to ROI from breeding axies. Currently supports
 ABC and ABCD loops. Crypto prices are pulled from known services, or can be
