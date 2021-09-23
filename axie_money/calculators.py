@@ -32,6 +32,9 @@ class BreedingProfitCalculator(object):
     most popular loops include the ABC and ABCD loops. ABC loops produce a single
     batch of offspring per generation, while ABCD loops produce two batches per
     generation.
+
+    :attribute price_floor: Expected floor price of sold parents.
+    :attribute price_ceiling: Expected maximum price of offspring.
     """
 
     def __init__(
@@ -170,14 +173,75 @@ class BreedingProfitCalculator(object):
             ).quantize(Decimal("0.01"))
         )
 
-    def axs_to_usd(self, amount: Decimal) -> Decimal:
-        """Converts AXS to USD."""
-        return self.axs_rate * amount
 
-    def slp_to_usd(self, amount: Decimal) -> Decimal:
-        """Converts SLP to USD."""
-        return self.slp_rate * amount
+class ScholarshipProfitCalculator(object):
+    """Calculates Axie Infinity scholarship profit based on given inputs.
 
-    def eth_to_usd(self, amount: Decimal) -> Decimal:
-        """Converts ETH to USD."""
-        return self.eth_rate * amount
+    Calculates the rate of return and breakeven of a given scholarship account.
+    A scholar is expected to earn a ``min_slp`` amount of SLP per day. ``max_slp``
+    is used to calculate for the scholar's average gain per day.
+
+    :attribute min_slp: The required minimum SLP a scholar has to farm per day.
+    :attribute max_slp: Theoretical maximum SLP a scholar can farm per day,
+        ideally based on past performance and win rate.
+    :attribute percentage: Percentage of SLP that the manager earns from the
+        scholarship. Should be a number between 0-1.
+    """
+
+    def __init__(
+        self,
+        price_converter: PriceConverter,
+        min_slp: Decimal,
+        max_slp: Decimal,
+        percentage: Decimal,
+    ):
+        self.price_converter = price_converter
+        self.min_slp = min_slp
+        self.max_slp = max_slp
+        self.percentage = percentage
+
+    @property
+    def potential_average_slp(self) -> Decimal:
+        """Estimated daily average SLP earnings."""
+        return Decimal((self.min_slp + self.max_slp) / 2)
+
+    def calculate_initial_capital(self, team_price: List[Decimal]) -> Decimal:
+        """Convert initial capital ETH price to USD.
+
+        :param team_price: ETH denominated acquisition price of the scholar's
+            team of axies.
+        :returns: Initial investment in USD.
+        """
+        return self.price_converter.eth_to_usd(sum(team_price)).quantize(
+            Decimal("0.01")
+        )
+
+    def calculate_actual_average_slp_per_day(
+        self, current_slp: Decimal, days: int
+    ) -> Decimal:
+        """Calculates the actual average SLP based on the scholar's performance.
+
+        :param current_slp: Current unclaimable SLP the scholar has farmed.
+        :param days: Number of days the scholar farmed ``current_slp``.
+        :returns: Average SLP the scholar farmed per day based on actual
+            performance.
+        """
+        return Decimal(current_slp / days).quantize(Decimal("0.01"))
+
+    def calculate_roi_days(
+        self, initial_capital: Decimal, average_slp: Decimal, days: int
+    ) -> Decimal:
+        """Calculates the number of days before breaking even.
+
+        :param initial_capital: USD denominated acquisition price of the
+            scholar's team of axies.
+        :param average_slp: Actual or potential average SLP the scholar can
+            farm per day.
+        :param days: Number of days in a specified period, ie. 30 if you
+            want to calculate the ROI based on monthly returns.
+        :returns: The number of periods it will take before breaking even.
+        """
+        return Decimal(
+            initial_capital
+            / (self.price_converter.slp_to_usd(average_slp) * self.percentage * days)
+        ).quantize(Decimal("0.01"))

@@ -1,6 +1,10 @@
 from decimal import Decimal
 
-from axie_money.calculators import BreedingProfitCalculator, PriceConverter
+from axie_money.calculators import (
+    BreedingProfitCalculator,
+    PriceConverter,
+    ScholarshipProfitCalculator,
+)
 
 
 class TestPriceConverter(object):
@@ -475,3 +479,51 @@ class TestBreedingProfitCalculatorABCDLoop(object):
         assert self.calculator.calculate_roi_days(
             initial_capital=initial_capital, breeding_cost=breeding_cost, profit=profit
         ) == Decimal("11.80")
+
+
+class TestScholarshipProfitCalculator(object):
+    calculator = ScholarshipProfitCalculator(
+        price_converter=PriceConverter(
+            slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+        ),
+        min_slp=Decimal("100"),
+        max_slp=Decimal("150"),
+        percentage=Decimal("0.5")
+    )
+
+    def test_potential_average_slp(self):
+        assert self.calculator.potential_average_slp == Decimal("125")
+
+    def test_calculate_initial_capital(self):
+        assert self.calculator.calculate_initial_capital(
+            [Decimal("0.18"), Decimal("0.22"), Decimal("0.169")]
+        ) == Decimal("1246.11")
+
+    def test_calculate_actual_average_slp_per_day(self):
+        assert self.calculator.calculate_actual_average_slp_per_day(
+            current_slp=2000, days=15
+        ) == Decimal("133.33")
+
+    def test_calculate_roi_days_potential(self):
+        initial_capital = self.calculator.calculate_initial_capital(
+            [Decimal("0.18"), Decimal("0.22"), Decimal("0.169")]
+        )
+        potential_average = self.calculator.potential_average_slp
+        days = 30
+
+        assert self.calculator.calculate_roi_days(
+            initial_capital, potential_average, days
+        ) == Decimal("2.56")
+
+    def test_calculate_roi_days_actual(self):
+        initial_capital = self.calculator.calculate_initial_capital(
+            [Decimal("0.18"), Decimal("0.22"), Decimal("0.169")]
+        )
+        days = 30
+        actual_average = self.calculator.calculate_actual_average_slp_per_day(
+            4000, days
+        )
+
+        assert self.calculator.calculate_roi_days(
+            initial_capital, actual_average, days
+        ) == Decimal("2.4")
