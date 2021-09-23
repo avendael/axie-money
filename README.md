@@ -13,12 +13,12 @@ from decimal import Decimal
 from axie_money.calculators import BreedingProfitCalculator, PriceConverter
 
 price_converter=PriceConverter(
-	slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+	slp_rate=Decimal("0.08"), axs_rate=Decimal("37"), eth_rate=Decimal("3140")
 )
 calculator = BreedingProfitCalculator(
 	price_converter=price_converter,
-	price_floor=Decimal("0.2358"),
-	price_ceiling=Decimal("0.73"),
+	price_floor=Decimal("0.173"),
+	price_ceiling=Decimal("0.69"),
 )
 initial_capital = calculator.calculate_initial_capital(
 	parent_prices=[
@@ -52,12 +52,12 @@ from decimal import Decimal
 from axie_money.calculators import ScholarshipProfitCalculator, PriceConverter
 
 price_converter=PriceConverter(
-	slp_rate=Decimal("0.26"), axs_rate=Decimal("40"), eth_rate=Decimal("2190")
+	slp_rate=Decimal("0.08"), axs_rate=Decimal("67"), eth_rate=Decimal("3140")
 )
 calculator = ScholarshipProfitCalculator(
 	price_converter=price_converter,
-	min_slp=Decimal("100"),
-	max_slp=Decimal("150"),
+	min_slp=Decimal("100"),  # Minimum required SLP the scholar has to farm per day
+	max_slp=Decimal("200"),  # Theoretical maximum SLP the scholar can farm per day
 	percentage=Decimal("0.5")
 )
 initial_capital = calculator.calculate_initial_capital(
@@ -65,7 +65,8 @@ initial_capital = calculator.calculate_initial_capital(
 )
 days = 30
 actual_average = calculator.calculate_actual_average_slp_per_day(
-	4000, days
+	4000,  # Unclaimable SLP the scholar is currently holding
+	days  # Number of days in a period, ie 30 if calculating for a monthly period
 )
 calculator.calculate_roi_days(
 	initial_capital, actual_average, days

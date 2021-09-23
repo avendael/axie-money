@@ -228,10 +228,10 @@ class ScholarshipProfitCalculator(object):
         """
         return Decimal(current_slp / days).quantize(Decimal("0.01"))
 
-    def calculate_roi_days(
+    def calculate_roi_periods(
         self, initial_capital: Decimal, average_slp: Decimal, days: int
     ) -> Decimal:
-        """Calculates the number of days before breaking even.
+        """Calculates the number of periods before breaking even.
 
         :param initial_capital: USD denominated acquisition price of the
             scholar's team of axies.
